@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+{% with profile = request.endpoint == 'profile' %}
+{% if profile %}
+<h2>{{ tacos[0].user.email.split('@')[0] }}'s Tacos</h2>
+{% else %}
+<h2>All the Tacos</h2>
+{% endif %}
+
+    {% if tacos.count() %}
+        <table class="u-full-width">
+          <thead>
+            <tr>
+              <th>Protein</th>
+              <th>Cheese?</th>
+              <th>Shell</th>
+              <th>Extras</th>
+              <th>Creator</th>
+              {% if profile %}
+                {% if current_user == user %}
+                  <th>Edit</th>
+                {% endif %}
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+        {% for taco in tacos %}
+            <tr>
+              <!-- taco attributes here -->
+            <th>  {{ taco.protein }} </th>
+            <th>{% if taco.cheese %}  YES {% else %} NO {% endif %}</th>
+            <th>  {{ taco.shell }} </th>
+            <th>  {{ taco.extras }} </th>
+            <th><a href="{{ url_for('profile', email=taco.user.email )}}">{{ taco.user.email.split('@')[0] }}</a></th>
+            {% if profile %}
+              {% if current_user == user %}
+                <th><a href="{{ url_for('delete', taco_id=taco.id )}}">DELETE</a></th>
+              {% endif %}
+            {% endif %}
+            </tr>
+        {% endfor %}
+          </tbody>
+        </table>
+    {% else %}
+      <h5>Oh no! There are currently no tacos!</h5>
+      {% if current_user.is_authenticated %}
+        <h5><a href="{{ url_for('taco') }}" class="new">Make some Tacos!</a></h5>
+      {% else %}
+        <h5><a href="{{ url_for('login') }}" class="icon-power" title="Log in">Log in</a> or <a href="{{ url_for('register')}}" class="icon-profile" title="Register">Register</a> to make some Tacos!</h5>
+      {% endif %}
+    {% endif %}
+{% endwith %}
+{% endblock %}
